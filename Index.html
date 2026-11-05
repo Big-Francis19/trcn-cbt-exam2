@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRCN PQE CBT Practice</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f3f6f9;
+    color: #17202a;
+}
+
+header {
+    background: #0b5d3b;
+    color: white;
+    padding: 18px 16px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 22px;
+}
+
+header p {
+    margin: 6px 0 0;
+    font-size: 13px;
+}
+
+.container {
+    max-width: 760px;
+    margin: auto;
+    padding: 16px;
+}
+
+.card {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 4px 18px #0001;
+    margin-bottom: 16px;
+}
+
+button {
+    border: 0;
+    border-radius: 9px;
+    padding: 12px 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.primary {
+    background: #0b5d3b;
+    color: white;
+}
+
+.secondary {
+    background: #e8efeb;
+    color: #0b5d3b;
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+}
+
+.timer {
+    font-weight: 800;
+    background: #fff2f2;
+    color: #b42318;
+    padding: 9px 12px;
+    border-radius: 8px;
+}
+
+.progress {
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 14px 0;
+}
+
+.bar {
+    height: 100%;
+    background: #0b5d3b;
+    width: 0;
+}
+
+.option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: #f7f8fa;
+    margin: 10px 0;
+    border: 2px solid transparent;
+}
+
+.option.selected {
+    border-color: #0b5d3b;
+    background: #e9f5ef;
+}
+
+.nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 18px;
+}
+
+.hidden {
+    display: none;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 6px;
+    margin-top: 15px;
+}
+
+.num {
+    padding: 8px 0;
+    background: #eef1f4;
+    text-align: center;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.num.done {
+    background: #0b5d3b;
+    color: white;
+}
+
+.num.current {
+    outline: 2px solid #f59e0b;
+}
+
+.result {
+    text-align: center;
+}
+
+.score {
+    font-size: 42px;
+    font-weight: 800;
+    color: #0b5d3b;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>TRCN PQE CBT PRACTICE</h1>
+    <p>Pedagogy • Literacy • Numeracy • ICT • Safeguarding</p>
+</header>
+
+<div class="container">
+
+    <!-- START SCREEN -->
+    <div id="start" class="card">
+        <h2>Welcome</h2>
+
+        <p>
+            This TRCN practice CBT contains
+            <b>50 questions</b> with a
+            <b>60-minute</b> examination timer.
+        </p>
+
+        <ul>
+            <li>Choose one answer per question.</li>
+            <li>Move between questions freely.</li>
+            <li>Submit when you are finished.</li>
+            <li>Your score will be calculated automatically.</li>
+        </ul>
+
+        <button class="primary" onclick="startExam()">
+            Start CBT Exam
+        </button>
+    </div>
+
+
+    <!-- EXAM SCREEN -->
+    <div id="exam" class="hidden">
+
+        <div class="card">
+
+            <div class="top">
+
+                <b id="category"></b>
+
+                <span class="timer" id="timer">
+                    60:00
+                </span>
+
+            </div>
+
+            <div class="progress">
+                <div class="bar" id="bar"></div>
+            </div>
+
+            <h2 id="qtext"></h2>
+
+            <div id="options"></div>
+
+            <div class="nav">
+
+                <button
+                    class="secondary"
+                    onclick="prevQ()">
+                    Previous
+                </button>
+
+                <button
+                    class="primary"
+                    onclick="nextQ()">
+                    Next
+                </button>
+
+            </div>
+
+            <div class="grid" id="grid"></div>
+
+        </div>
+
+        <div class="card" style="text-align:center">
+
+            <button
+                class="primary"
+                onclick="submitExam()">
+                Submit Exam
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- RESULT SCREEN -->
+    <div id="result" class="card hidden result">
+
+        <h2>Exam Result</h2>
+
+        <div class="score" id="score"></div>
+
+        <p id="message"></p>
+
+        <button
+            class="primary"
+            onclick="location.reload()">
+            Take Exam Again
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   QUESTIONS
+========================= */
+
+const questions = [
+
+[
+"Pedagogy",
+"Which teaching method places the learner at the centre of the learning process?",
+[
+"Lecture method",
+"Learner-centred method",
+"Dictation method",
+"Demonstration method"
+],
+1
+],
+
+[
+"Pedagogy",
+"The main purpose of a lesson plan is to:",
+[
+"Punish late students",
+"Guide the teacher in achieving learning objectives",
+"Replace the textbook",
+"Record students' attendance"
+],
+1
+],
+
+[
+"Pedagogy",
+"Formative assessment is mainly used to:",
+[
+"Monitor learning during instruction",
+"Award final certificates",
+"Rank schools nationally",
+"Determine promotion only"
+],
+0
+],
+
+[
+"Pedagogy",
+"Which learning theory is associated with reinforcement and observable behaviour?",
+[
+"Behaviourism",
+"Constructivism",
+"Humanism",
+"Cognitivism"
+],
+0
+],
+
+[
+"Pedagogy",
+"A teacher who gives students different tasks according to their abilities is practising:",
+[
+"Punishment",
+"Differentiated instruction",
+"Memorisation",
+"Dictation"
+],
+1
+],
+
+[
+"Pedagogy",
+"Which is an example of an instructional objective?",
+[
+"Students will understand everything",
+"Students will be happy",
+"Students will list five causes of soil erosion",
+"Students will attend school"
+],
+2
+],
+
+[
+"Pedagogy",
+"Classroom management primarily helps a teacher to:",
+[
+"Create an environment conducive to learning",
+"Increase school fees",
+"Reduce the curriculum",
+"Avoid teaching"
+],
+0
+],
+
+[
+"Pedagogy",
+"Which assessment is normally conducted at the end of a course or programme?",
+[
+"Diagnostic",
+"Formative",
+"Summative",
+"Informal"
+],
+2
+],
+
+[
+"Pedagogy",
+"The ability to apply previously learned knowledge to a new situation demonstrates:",
+[
+"Transfer of learning",
+"Punishment",
+"Rote learning",
+"Forgetting"
+],
+0
+],
+
+[
+"Pedagogy",
+"A good teacher should primarily act as a:",
+[
+"Facilitator of learning",
+"Dictator",
+"Judge",
+"Politician"
+],
+0
+],
+
+[
+"Pedagogy",
+"Diagnostic assessment is mainly used to:",
+[
+"Identify learners' strengths and weaknesses",
+"Give graduation certificates",
+"Punish weak learners",
+"Replace teaching"
+],
+0
+],
+
+[
+"Pedagogy",
+"Which classroom practice best promotes critical thinking?",
+[
+"Asking students to memorise everything",
+"Asking open-ended questions",
+"Preventing discussion",
+"Giving answers before questions"
+],
+1
+],
+
+[
+"Pedagogy",
+"Reinforcement is used in teaching to:",
+[
+"Encourage desired behaviour",
+"Eliminate all examinations",
+"Increase homework unnecessarily",
+"Stop communication"
+],
+0
+],
+
+[
+"Pedagogy",
+"Which is NOT a characteristic of effective teaching?",
+[
+"Clear objectives",
+"Appropriate teaching methods",
+"Ignoring learners' differences",
+"Continuous assessment"
+],
+2
+],
+
+[
+"Pedagogy",
+"Bloom's Taxonomy is associated with:",
+[
+"Educational objectives",
+"School financing",
+"Teacher salaries",
+"School construction"
+],
+0
+],
+
+[
+"Pedagogy",
+"When students work together to solve a problem, the teacher is using:",
+[
+"Cooperative learning",
+"Rote learning",
+"Dictation",
+"Individual punishment"
+],
+0
+],
+
+[
+"Pedagogy",
+"Teaching aids are important because they:",
+[
+"Make learning more concrete and interesting",
+"Replace the teacher completely",
+"Eliminate examinations",
+"Make students independent of school"
+],
+0
+],
+
+[
+"Pedagogy",
+"Which is an example of intrinsic motivation?",
+[
+"Studying because you enjoy learning",
+"Studying to receive money",
+"Studying to avoid punishment",
+"Studying to receive a prize"
+],
+0
+],
+
+[
+"Pedagogy",
+"A teacher's professional ethics require the teacher to:",
+[
+"Treat learners fairly and professionally",
+"Favour wealthy students",
+"Reveal confidential student information",
+"Discriminate among learners"
+],
+0
+],
+
+[
+"Pedagogy",
+"The best way to determine whether a lesson objective has been achieved is through:",
+[
+"Assessment",
+"Attendance",
+"School fees",
+"Uniform inspection"
+],
+0
+],
+
+
+/* LITERACY */
+
+[
+"Literacy",
+"Choose the correctly spelt word:",
+[
+"Accomodation",
+"Accommodation",
+"Acommodation",
+"Accommmodation"
+],
+1
+],
+
+[
+"Literacy",
+"The opposite of 'scarce' is:",
+[
+"Rare",
+"Limited",
+"Abundant",
+"Small"
+],
+2
+],
+
+[
+"Literacy",
+"Choose the correct sentence:",
+[
+"She don't like mathematics.",
+"She doesn't likes mathematics.",
+"She doesn't like mathematics.",
+"She don't likes mathematics."
+],
+2
+],
+
+[
+"Literacy",
+"A passage that explains how or why something happens is mainly:",
+[
+"Expository",
+"Narrative",
+"Dramatic",
+"Poetic"
+],
+0
+],
+
+[
+"Literacy",
+"The word 'quickly' is a/an:",
+[
+"Noun",
+"Adjective",
+"Adverb",
+"Pronoun"
+],
+2
+],
+
+[
+"Literacy",
+"Choose the word closest in meaning to 'essential'.",
+[
+"Unnecessary",
+"Important",
+"Difficult",
+"Ordinary"
+],
+1
+],
+
+[
+"Literacy",
+"Which punctuation mark is normally used at the end of a direct question?",
+[
+"Full stop",
+"Comma",
+"Question mark",
+"Colon"
+],
+2
+],
+
+[
+"Literacy",
+"A person who writes books is called a/an:",
+[
+"Editor",
+"Author",
+"Publisher",
+"Librarian"
+],
+1
+],
+
+
+/* NUMERACY */
+
+[
+"Numeracy",
+"What is 25% of 200?",
+[
+"25",
+"40",
+"50",
+"75"
+],
+2
+],
+
+[
+"Numeracy",
+"If 5 books cost ₦2,500, how much will 8 books cost at the same rate?",
+[
+"₦3,000",
+"₦3,500",
+"₦4,000",
+"₦4,500"
+],
+2
+],
+
+[
+"Numeracy",
+"Simplify: 3/4 + 1/4",
+[
+"1/2",
+"1",
+"2",
+"3/4"
+],
+1
+],
+
+[
+"Numeracy",
+"What is the average of 10, 20 and 30?",
+[
+"15",
+"20",
+"25",
+"30"
+],
+1
+],
+
+[
+"Numeracy",
+"If a class has 40 students and 30 are present, what percentage is present?",
+[
+"50%",
+"60%",
+"75%",
+"80%"
+],
+2
+],
+
+[
+"Numeracy",
+"What is 12 × 8?",
+[
+"86",
+"96",
+"108",
+"112"
+],
+1
+],
+
+[
+"Numeracy",
+"A teacher has 120 exercise books and shares them equally among 6 classes. How many does each class receive?",
+[
+"15",
+"20",
+"25",
+"30"
+],
+1
+],
+
+[
+"Numeracy",
+"If ₦10,000 is reduced by 10%, the new price is:",
+[
+"₦8,000",
+"₦8,500",
+"₦9,000",
+"₦9,500"
+],
+2
+],
+
+
+/* ICT */
+
+[
+"ICT",
+"What does ICT stand for?",
+[
+"Information and Communication Technology",
+"International Computer Training",
+"Information Control Technique",
+"Internet Communication Training"
+],
+0
+],
+
+[
+"ICT",
+"Which device is primarily used to enter text into a computer?",
+[
+"Monitor",
+"Keyboard",
+"Speaker",
+"Projector"
+],
+1
+],
+
+[
+"ICT",
+"Which of the following is an example of an operating system?",
+[
+"Windows",
+"Google",
+"YouTube",
+"Gmail"
+],
+0
+],
+
+[
+"ICT",
+"Which tool is commonly used for online video conferencing?",
+[
+"Zoom",
+"Calculator",
+"Paint",
+"Notepad"
+],
+0
+],
+
+[
+"ICT",
+"A strong password should generally:",
+[
+"Be your first name",
+"Be easy for everyone to guess",
+"Combine different types of characters",
+"Be '123456'"
+],
+2
+],
+
+[
+"ICT",
+"Which device displays information from a computer visually?",
+[
+"Keyboard",
+"Monitor",
+"Mouse",
+"Microphone"
+],
+1
+],
+
+[
+"ICT",
+"One important benefit of ICT in education is that it:",
+[
+"Can provide access to digital learning resources",
+"Eliminates the need for teachers",
+"Prevents students from communicating",
+"Makes assessment impossible"
+],
+0
+],
+
+
+/* SAFEGUARDING */
+
+[
+"Safeguarding",
+"Child safeguarding primarily aims to:",
+[
+"Protect children from harm and abuse",
+"Increase school fees",
+"Reduce school hours",
+"Punish parents"
+],
+0
+],
+
+[
+"Safeguarding",
+"If a teacher suspects that a child is being abused, the teacher should:",
+[
+"Ignore it",
+"Investigate and punish the suspected person personally",
+"Follow the appropriate safeguarding/reporting procedure",
+"Tell all students"
+],
+2
+],
+
+[
+"Safeguarding",
+"Which is an example of emotional abuse?",
+[
+"Persistent humiliation and threats",
+"Giving homework",
+"Teaching mathematics",
+"Providing school materials"
+],
+0
+],
+
+[
+"Safeguarding",
+"A safe learning environment should be:",
+[
+"Respectful and free from abuse and discrimination",
+"Based on fear",
+"Controlled through violence",
+"Available only to high-performing students"
+],
+0
+],
+
+[
+"Safeguarding",
+"Teachers should maintain appropriate professional boundaries with learners because:",
+[
+"It protects learners and maintains professional conduct",
+"It prevents all communication",
+"It makes teaching impossible",
+"It eliminates classroom activities"
+],
+0
+],
+
+[
+"Safeguarding",
+"Bullying can include:",
+[
+"Repeated intimidation or harassment",
+"Helping a classmate",
+"Group discussion",
+"Giving constructive feedback"
+],
+0
+],
+
+[
+"Safeguarding",
+"Confidential information about a learner should generally be:",
+[
+"Posted online",
+"Shared with everyone",
+"Handled responsibly and only disclosed through appropriate channels",
+"Discussed publicly in class"
+],
+2
+]
+
+];
+
+
+/* =========================
+   EXAM VARIABLES
+========================= */
+
+let current = 0;
+
+let answers =
+    Array(questions.length).fill(null);
+
+let seconds = 3600;
+
+let interval;
+
+
+/* =========================
+   START EXAM
+========================= */
+
+function startExam() {
+
+    document
+        .getElementById("start")
+        .classList
+        .add("hidden");
+
+    document
+        .getElementById("exam")
+        .classList
+        .remove("hidden");
+
+    render();
+
+    interval = setInterval(() => {
+
+        seconds--;
+
+        updateTimer();
+
+        if (seconds <= 0) {
+            submitExam();
+        }
+
+    }, 1000);
+}
+
+
+/* =========================
+   TIMER
+========================= */
+
+function updateTimer() {
+
+    let minutes =
+        Math.floor(seconds / 60);
+
+    let secs =
+        seconds % 60;
+
+    document
+        .getElementById("timer")
+        .textContent =
+        `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+}
+
+
+/* =========================
+   DISPLAY QUESTION
+========================= */
+
+function render() {
+
+    const q = questions[current];
+
+    document
+        .getElementById("category")
+        .textContent = q[0];
+
+    document
+        .getElementById("qtext")
+        .textContent =
+        `${current + 1}. ${q[1]}`;
+
+    document
+        .getElementById("bar")
+        .style.width =
+        ((current + 1) / questions.length * 100) + "%";
+
+
+    const options =
+        document.getElementById("options");
+
+    options.innerHTML = "";
+
+
+    q[2].forEach((answer, index) => {
+
+        let button =
+            document.createElement("button");
+
+        button.className =
+            "option" +
+            (answers[current] === index
+                ? " selected"
+                : "");
+
+        button.textContent =
+            String.fromCharCode(65 + index)
+            + ". "
+            + answer;
+
+        button.onclick = () => {
+
+            answers[current] = index;
+
+            render();
+
+        };
+
+        options.appendChild(button);
+
+    });
+
+
+    /* QUESTION NUMBER GRID */
+
+    const grid =
+        document.getElementById("grid");
+
+    grid.innerHTML = "";
+
+
+    questions.forEach((_, index) => {
+
+        let number =
+            document.createElement("div");
+
+        number.className =
+            "num" +
+            (answers[index] !== null
+                ? " done"
+                : "") +
+            (index === current
+                ? " current"
+                : "");
+
+        number.textContent =
+            index + 1;
+
+        number.onclick = () => {
+
+            current = index;
+
+            render();
+
+        };
+
+        grid.appendChild(number);
+
+    });
+}
+
+
+/* =========================
+   NEXT
+========================= */
+
+function nextQ() {
+
+    if (current < questions.length - 1) {
+
+        current++;
+
+        render();
+
+    } else {
+
+        submitExam();
+
+    }
+}
+
+
+/* =========================
+   PREVIOUS
+========================= */
+
+function prevQ() {
+
+    if (current > 0) {
+
+        current--;
+
+        render();
+
+    }
+}
+
+
+/* =========================
+   SUBMIT EXAM
+========================= */
+
+function submitExam() {
+
+    clearInterval(interval);
+
+
+    let score = 0;
+
+
+    answers.forEach((answer, index) => {
+
+        if (
+            answer ===
+            questions[index][3]
+        ) {
+
+            score++;
+
+        }
+
+    });
+
+
+    document
+        .getElementById("exam")
+        .classList
+        .add("hidden");
+
+    document
+        .getElementById("result")
+        .classList
+        .remove("hidden");
+
+
+    document
+        .getElementById("score")
+        .textContent =
+        `${score}/50`;
+
+
+    document
+        .getElementById("message")
+        .textContent =
+        `You scored ${Math.round(score / 50 * 100)}%.
+         Unanswered questions:
+         ${answers.filter(x => x === null).length}.`;
+}
+
+</script>
+
+</body>
+</html>
